@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
       isGlobal: true,
       load: [typeorm],
     }),
+
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) =>

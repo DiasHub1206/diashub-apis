@@ -3,3 +3,8 @@ export enum AccountStatus {
   INACTIVE = 'inactive',
   LOCKED = 'locked',
 }
+
+export enum UserRole {
+  ADMIN = 'admin',
+  STUDENT = 'student',
+}

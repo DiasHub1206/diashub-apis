@@ -1,5 +1,5 @@
 import { PlatformEntity } from 'src/common/entity/platform.entity';
-import { AccountStatus } from 'src/common/enums';
+import { AccountStatus, UserRole } from 'src/common/enums';
 import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -20,11 +20,14 @@ export class User extends PlatformEntity {
   @Column({ type: 'varchar', nullable: false })
   password: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   mobileNumber: string;
 
-  @Column({ type: 'varchar', nullable: false, default: '+91' })
+  @Column({ type: 'varchar', nullable: true, default: '+91' })
   countryCode: string;
+
+  @Column({ type: 'varchar', nullable: false })
+  role: UserRole;
 
   @Column({
     type: 'enum',

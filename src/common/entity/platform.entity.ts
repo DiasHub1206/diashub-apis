@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 } from 'uuid';
+import { getRequestContext } from '../request.context';
 
 export class PlatformEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -23,19 +24,19 @@ export class PlatformEntity extends BaseEntity {
 
   @BeforeInsert()
   async populateDetails(): Promise<void> {
-    // const userContext = await getRequestContext();
-    // this.id = v4();
-    // this.createdAt = new Date();
-    // this.updatedAt = new Date();
-    // this.createdBy = userContext.userId;
-    // this.updatedBy = userContext.userId;
-    // this.deleted = false;
+    const userContext = await getRequestContext();
+    this.id = v4();
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
+    this.createdBy = userContext?.userId;
+    this.updatedBy = userContext?.userId;
+    this.deleted = false;
   }
 
   @BeforeUpdate()
   async populateUpdateDetails(): Promise<void> {
-    // const userContext = await getRequestContext();
-    // this.updatedAt = new Date();
-    // this.updatedBy = userContext.userId;
+    const userContext = await getRequestContext();
+    this.updatedAt = new Date();
+    this.updatedBy = userContext.userId;
   }
 }
