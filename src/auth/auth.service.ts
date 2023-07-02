@@ -67,7 +67,7 @@ export class AuthService {
     });
 
     return res.json({
-      ...token,
+      // ...token,
       id: user.id,
       username: user.username,
       email: user.email,

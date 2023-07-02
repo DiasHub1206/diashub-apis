@@ -60,8 +60,7 @@ export class AuthController {
    * @returns {Promise<JwtPayload>}
    * @memberof AuthController
    */
-  @OnlyLoggedOut() // [1]
-  @AllowUnverified() // [2]
+  // @OnlyLoggedOut() // [1]
   @UseGuards(LocalAuthGuard) // [2]
   @Post('login')
   public async login(@Req() req, @Res() res): Promise<JwtPayload> {
