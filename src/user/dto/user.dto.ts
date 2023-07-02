@@ -19,12 +19,6 @@ export class UserDto {
   lastName: string;
 
   @IsNotEmpty()
-  fullName: string;
-
-  @IsNotEmpty()
-  profilePhoto: string;
-
-  @IsNotEmpty()
   @IsEnum(UserRole)
   role: UserRole;
 

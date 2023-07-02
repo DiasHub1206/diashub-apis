@@ -72,7 +72,7 @@ export class UserService {
     user.username = username;
     user.email = email;
     user.password = password;
-    user.accountStatus = AccountStatus.INACTIVE;
+    user.accountStatus = AccountStatus.ACTIVE;
     user.role = role;
     // const user = this._user.create({
     //   accountStatus: AccountStatus.INACTIVE,

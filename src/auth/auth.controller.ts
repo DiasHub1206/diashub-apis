@@ -66,10 +66,9 @@ export class AuthController {
   @UseGuards(LocalAuthGuard) // [2]
   @Post('login')
   public async login(
-    @Body() loginBody: LoginUserDto,
     @Req() { user }: { user: UserEntityType },
   ): Promise<JwtPayload> {
     // log in with user credentials and return jwt payload
-    return this._authServ.login(loginBody);
+    return this._authServ.login(user);
   }
 }

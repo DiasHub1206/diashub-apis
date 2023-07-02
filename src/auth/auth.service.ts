@@ -44,34 +44,19 @@ export class AuthService {
    * @returns {Promise<JwtPayload>}
    * @memberof AuthService
    */
-  async login(userLogin: LoginUserDto): Promise<JwtPayload> {
-    // if account is inactive & email is verified, activate the account
-    // if (user.accountStatus === AccountStatus.INACTIVE) {
-    //   await this._userServ.setAccountActive(user.id);
-    // }
+  async login(user: UserEntityType): Promise<JwtPayload> {
+    // generate and sign a Jwt token
+    const token = this._createJwtToken(user);
 
-    const user = await this._userServ.findOne({
-      where: { email: userLogin.email },
-    });
-
-    if (!user) {
-      throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-    }
-
-    if (await bcrypt.compare(userLogin.password, user.password)) {
-      // generate and sign a Jwt token
-      const token = this._createJwtToken(user);
-      return {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        role: user.role,
-        ...token,
-      };
-    }
-    throw new HttpException('Wrong Password', HttpStatus.UNAUTHORIZED);
+    return {
+      ...token,
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    };
 
     // return an object that contains the Jwt signed token & optional data
   }
@@ -84,12 +69,19 @@ export class AuthService {
    * @returns
    * @memberof AuthService
    */
-  private _createJwtToken({ username }: any) {
+  private _createJwtToken(user: User) {
     // get jwt expiration time
     const expiresIn = this._configServ.get('JWT_SESSION_EXPIRES_IN');
 
     // define a payload to be signed
-    const payload: Partial<JwtPayload> = { username };
+    const payload: Partial<JwtPayload> = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
 
     // get an access token by signing the payload
     const accessToken = this._jwtServ.sign(payload);
@@ -125,7 +117,7 @@ export class AuthService {
     return user;
   }
 
-  async validateUserJwt(payload: JwtPayload): Promise<User> {
+  async validateUserJwt(payload: JwtPayload): Promise<JwtPayload> {
     // get user by passing Jwt payload
     const user = await this._userServ.findByPayload(payload);
 
@@ -135,6 +127,6 @@ export class AuthService {
     }
 
     // return user
-    return user;
+    return payload;
   }
 }

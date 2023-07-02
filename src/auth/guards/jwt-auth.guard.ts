@@ -50,21 +50,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return null;
     }
 
-    // check to see if AllowUnverified() decorator is not present
-    const allowUnverifiedDec = this._reflector.getAllAndOverride<boolean>(
-      ALLOW_UNVERIFIED_DEC_KEY,
-      [context.getHandler(), context.getClass()],
-    );
-
-    /**
-     * If AllowUnverified() decorator is not present, check if user is verified,
-     * if the user is not verified deny access.
-     */
-    // if (!allowUnverifiedDec) {
-    //   if (user.emailStatus === EmailStatus.UNVERIFIED)
-    //     throw new UnauthorizedException();
-    // }
-
     return super.handleRequest(err, user, info, context);
   }
 }
