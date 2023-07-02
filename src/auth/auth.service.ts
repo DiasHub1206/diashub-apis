@@ -1,15 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AccountStatus } from 'src/common/enums';
 import { SignupPostBodyDto } from 'src/user/dto/signup-post-body.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from './interfaces/payload.interface';
 import { RegistrationStatus } from './interfaces/regisration-status.interface';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntityType } from 'src/common/types';
-import { LoginUserDto } from 'src/user/dto/user-login.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/user/entity/user.entity';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -44,11 +43,30 @@ export class AuthService {
    * @returns {Promise<JwtPayload>}
    * @memberof AuthService
    */
-  async login(user: UserEntityType): Promise<JwtPayload> {
+  async login(req: Request, res: Response): Promise<any> {
     // generate and sign a Jwt token
+    const { user } = req as any;
+
     const token = this._createJwtToken(user);
 
-    return {
+    const expiresIn = new Date();
+    expiresIn.setDate(expiresIn.getDate() + 1);
+
+    // need to define domain
+    const cookieDomains = req.hostname === 'localhost' ? ['localhost'] : [''];
+
+    cookieDomains.forEach((d) => {
+      res.cookie('access-token', token, {
+        expires: expiresIn,
+        httpOnly: false,
+        path: '/',
+        secure: false,
+        sameSite: 'lax',
+        domain: d,
+      });
+    });
+
+    return res.json({
       ...token,
       id: user.id,
       username: user.username,
@@ -56,7 +74,7 @@ export class AuthService {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-    };
+    });
 
     // return an object that contains the Jwt signed token & optional data
   }

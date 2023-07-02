@@ -5,14 +5,13 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UserEntityType } from 'src/common/types';
 import { AllowUnverified } from 'src/decorators/allow-unverified.decorator';
 import { OnlyLoggedOut } from 'src/decorators/only-logged-out.decorator';
 import { SignupPostBodyDto } from 'src/user/dto/signup-post-body.dto';
-import { LoginUserDto } from 'src/user/dto/user-login.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtPayload } from './interfaces/payload.interface';
@@ -65,10 +64,8 @@ export class AuthController {
   @AllowUnverified() // [2]
   @UseGuards(LocalAuthGuard) // [2]
   @Post('login')
-  public async login(
-    @Req() { user }: { user: UserEntityType },
-  ): Promise<JwtPayload> {
+  public async login(@Req() req, @Res() res): Promise<JwtPayload> {
     // log in with user credentials and return jwt payload
-    return this._authServ.login(user);
+    return this._authServ.login(req, res);
   }
 }

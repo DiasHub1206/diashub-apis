@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
 
 async function setupSwager(app) {
   const swaggerOptions = new DocumentBuilder()
@@ -22,6 +23,8 @@ async function bootstrap() {
     origin: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
+
+  app.use(cookieParser());
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
