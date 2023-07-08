@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
+  DeleteResult,
   FindOneOptions,
   ILike,
   ObjectLiteral,
@@ -189,6 +190,58 @@ export class UserService {
     return result[0];
   }
 
+  async getUserPublicDetails(id: string): Promise<UserEntity> {
+    const result = await this._user
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+
+        'exp.id',
+        'exp.employmentType',
+        'exp.companyName',
+        'exp.location',
+        'exp.workLocationType',
+        'exp.isCurrentlyWorking',
+        'exp.startDate',
+        'exp.endDate',
+        'exp.description',
+
+        'edu.id',
+        'edu.school',
+        'edu.degree',
+        'edu.fieldOfStudy',
+        'edu.grade',
+        'edu.activities',
+        'edu.startDate',
+        'edu.endDate',
+        'edu.description',
+
+        'proj.id',
+        'proj.name',
+        'proj.description',
+        'proj.startDate',
+        'proj.endDate',
+        'proj.isCurrentlyWorking',
+
+        'cert.id',
+        'cert.company',
+        'cert.degree',
+        'cert.credentialId',
+        'cert.credentialUrl',
+        'cert.issueDate',
+        'cert.expirationDate',
+      ])
+      .leftJoin('user.experiences', 'exp')
+      .leftJoin('user.educations', 'edu')
+      .leftJoin('user.projects', 'proj')
+      .leftJoin('user.certifications', 'cert')
+      .where('user.id =:id', { id })
+      .getMany();
+
+    return result[0];
+  }
   async createUserExperience(
     userId: string,
     userExperienceDto: AddUserExperienceDto,
@@ -218,6 +271,13 @@ export class UserService {
     }
 
     return true;
+  }
+
+  async deleteUserExperience(
+    id: string,
+    userId: string,
+  ): Promise<DeleteResult> {
+    return await this._userExpe.delete({ id, userId });
   }
 
   async createUserEducation(
@@ -251,6 +311,10 @@ export class UserService {
     return true;
   }
 
+  async deleteUserEducation(id: string, userId: string): Promise<DeleteResult> {
+    return await this._userEduc.delete({ id, userId });
+  }
+
   async createUserProject(
     userId: string,
     userProjectDto: AddUserProjectDto,
@@ -282,6 +346,10 @@ export class UserService {
     return true;
   }
 
+  async deleteUserProject(id: string, userId: string): Promise<DeleteResult> {
+    return await this._userProj.delete({ id, userId });
+  }
+
   async createUserCertification(
     userId: string,
     userCertificationDto: AddUserCertificationDto,
@@ -311,5 +379,12 @@ export class UserService {
     }
 
     return true;
+  }
+
+  async deleteUserCertification(
+    id: string,
+    userId: string,
+  ): Promise<DeleteResult> {
+    return await this._userCert.delete({ id, userId });
   }
 }

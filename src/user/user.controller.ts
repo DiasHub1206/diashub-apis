@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -26,6 +29,7 @@ import { UserService } from './user.service';
 import { UpdateUserProjectDto } from './dto/update-user-project.entity';
 import { UpdateUserCertificationDto } from './dto/update-user-certification.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { DeleteResult } from 'typeorm';
 
 @Controller('api/user')
 @ApiTags('User')
@@ -53,6 +57,20 @@ export class UserController {
     @Request() request: Express.Request,
   ): Promise<boolean> {
     return await this._userServ.update((request as any).user.id, updateUserDto);
+  }
+
+  @UserHasRole([UserRole.STUDENT, UserRole.ADMIN])
+  @Get(':id/public-profile')
+  async getUserPublicDetails(
+    @Param() { id: userId }: IdDto,
+  ): Promise<UserEntity> {
+    const result = await this._userServ.getUserPublicDetails(userId);
+
+    if (!result) {
+      throw new HttpException('Profile not found', HttpStatus.NOT_FOUND);
+    }
+
+    return result;
   }
 
   @UserHasRole([UserRole.STUDENT])
@@ -83,6 +101,17 @@ export class UserController {
   }
 
   @UserHasRole([UserRole.STUDENT])
+  @Delete('me/experience/:id')
+  async deleteUserExperience(
+    @Param() { id }: IdDto,
+    @Request() request: Express.Request,
+  ): Promise<DeleteResult> {
+    const userId = (request as any).user.id;
+
+    return await this._userServ.deleteUserExperience(id, userId);
+  }
+
+  @UserHasRole([UserRole.STUDENT])
   @Post('me/education')
   async createUserEducation(
     @Body() userEducationDto: AddUserEducationDto,
@@ -110,6 +139,17 @@ export class UserController {
   }
 
   @UserHasRole([UserRole.STUDENT])
+  @Delete('me/education/:id')
+  async deleteUserEducation(
+    @Param() { id }: IdDto,
+    @Request() request: Express.Request,
+  ): Promise<DeleteResult> {
+    const userId = (request as any).user.id;
+
+    return await this._userServ.deleteUserEducation(id, userId);
+  }
+
+  @UserHasRole([UserRole.STUDENT])
   @Post('me/project')
   async createUserProject(
     @Body() userProjectDto: AddUserProjectDto,
@@ -130,6 +170,17 @@ export class UserController {
     const userId = (request as any).user.id;
 
     return await this._userServ.updateUserProject(id, userId, userProjectDto);
+  }
+
+  @UserHasRole([UserRole.STUDENT])
+  @Delete('me/project/:id')
+  async deleteUserProject(
+    @Param() { id }: IdDto,
+    @Request() request: Express.Request,
+  ): Promise<DeleteResult> {
+    const userId = (request as any).user.id;
+
+    return await this._userServ.deleteUserProject(id, userId);
   }
 
   @UserHasRole([UserRole.STUDENT])
@@ -160,5 +211,16 @@ export class UserController {
       userId,
       userCertificationDto,
     );
+  }
+
+  @UserHasRole([UserRole.STUDENT])
+  @Delete('me/certification/:id')
+  async deleteUserCertification(
+    @Param() { id }: IdDto,
+    @Request() request: Express.Request,
+  ): Promise<DeleteResult> {
+    const userId = (request as any).user.id;
+
+    return await this._userServ.deleteUserCertification(id, userId);
   }
 }
