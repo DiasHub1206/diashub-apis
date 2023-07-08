@@ -25,6 +25,7 @@ import { UserEntity } from './entity/user.entity';
 import { UserService } from './user.service';
 import { UpdateUserProjectDto } from './dto/update-user-project.entity';
 import { UpdateUserCertificationDto } from './dto/update-user-certification.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('api/user')
 @ApiTags('User')
@@ -43,6 +44,15 @@ export class UserController {
     @Request() request: Express.Request,
   ): Promise<UserEntity> {
     return await this._userServ.getUserDetails((request as any).user.id);
+  }
+
+  @UserHasRole([UserRole.STUDENT])
+  @Patch('me/profile-settings')
+  async update(
+    @Body() updateUserDto: UpdateUserDto,
+    @Request() request: Express.Request,
+  ): Promise<boolean> {
+    return await this._userServ.update((request as any).user.id, updateUserDto);
   }
 
   @UserHasRole([UserRole.STUDENT])

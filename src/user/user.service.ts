@@ -25,6 +25,7 @@ import { UpdateUserExperienceDto } from './dto/update-user-experience.dto';
 import { UpdateUserEducationDto } from './dto/update-user-education.dto';
 import { UpdateUserProjectDto } from './dto/update-user-project.entity';
 import { UpdateUserCertificationDto } from './dto/update-user-certification.entity';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -117,12 +118,75 @@ export class UserService {
     return user;
   }
 
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<boolean> {
+    const updatedResult = await this._user.update({ id }, { ...updateUserDto });
+
+    if (updatedResult.affected === 0) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    return true;
+  }
+
   async findByPayload({ username }): Promise<UserEntityType> {
     return this.findOne({ where: { username } });
   }
 
   async updateLastActiveOn({ id }: IdDto): Promise<UpdateResult> {
     return await this._user.update({ id }, { lastActiveOn: new Date() });
+  }
+
+  async getUserDetails(id: string): Promise<UserEntity> {
+    const result = await this._user
+      .createQueryBuilder('user')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+
+        'exp.id',
+        'exp.employmentType',
+        'exp.companyName',
+        'exp.location',
+        'exp.workLocationType',
+        'exp.isCurrentlyWorking',
+        'exp.startDate',
+        'exp.endDate',
+        'exp.description',
+
+        'edu.id',
+        'edu.school',
+        'edu.degree',
+        'edu.fieldOfStudy',
+        'edu.grade',
+        'edu.activities',
+        'edu.startDate',
+        'edu.endDate',
+        'edu.description',
+
+        'proj.id',
+        'proj.name',
+        'proj.description',
+        'proj.startDate',
+        'proj.endDate',
+        'proj.isCurrentlyWorking',
+
+        'cert.id',
+        'cert.company',
+        'cert.degree',
+        'cert.credentialId',
+        'cert.credentialUrl',
+        'cert.issueDate',
+        'cert.expirationDate',
+      ])
+      .leftJoin('user.experiences', 'exp')
+      .leftJoin('user.educations', 'edu')
+      .leftJoin('user.projects', 'proj')
+      .leftJoin('user.certifications', 'cert')
+      .where('user.id =:id', { id })
+      .getMany();
+
+    return result[0];
   }
 
   async createUserExperience(
@@ -212,7 +276,7 @@ export class UserService {
     );
 
     if (updatedResult.affected === 0) {
-      throw new HttpException('Education not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Project not found', HttpStatus.NOT_FOUND);
     }
 
     return true;
@@ -243,62 +307,9 @@ export class UserService {
     );
 
     if (updatedResult.affected === 0) {
-      throw new HttpException('Education not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Certification not found', HttpStatus.NOT_FOUND);
     }
 
     return true;
-  }
-
-  async getUserDetails(id: string): Promise<UserEntity> {
-    const result = await this._user
-      .createQueryBuilder('user')
-      .select([
-        'user.id',
-        'user.firstName',
-        'user.lastName',
-
-        'exp.id',
-        'exp.employmentType',
-        'exp.companyName',
-        'exp.location',
-        'exp.workLocationType',
-        'exp.isCurrentlyWorking',
-        'exp.startDate',
-        'exp.endDate',
-        'exp.description',
-
-        'edu.id',
-        'edu.school',
-        'edu.degree',
-        'edu.fieldOfStudy',
-        'edu.grade',
-        'edu.activities',
-        'edu.startDate',
-        'edu.endDate',
-        'edu.description',
-
-        'proj.id',
-        'proj.name',
-        'proj.description',
-        'proj.startDate',
-        'proj.endDate',
-        'proj.isCurrentlyWorking',
-
-        'cert.id',
-        'cert.company',
-        'cert.degree',
-        'cert.credentialId',
-        'cert.credentialUrl',
-        'cert.issueDate',
-        'cert.expirationDate',
-      ])
-      .leftJoin('user.experiences', 'exp')
-      .leftJoin('user.educations', 'edu')
-      .leftJoin('user.projects', 'proj')
-      .leftJoin('user.certifications', 'cert')
-      .where('user.id =:id', { id })
-      .getMany();
-
-    return result[0];
   }
 }
