@@ -7,7 +7,7 @@ import { RegistrationStatus } from './interfaces/regisration-status.interface';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntityType } from 'src/common/types';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entity/user.entity';
 import { Request, Response } from 'express';
 
 @Injectable()
@@ -87,7 +87,7 @@ export class AuthService {
    * @returns
    * @memberof AuthService
    */
-  private _createJwtToken(user: User) {
+  private _createJwtToken(user: UserEntity) {
     // get jwt expiration time
     const expiresIn = this._configServ.get('JWT_SESSION_EXPIRES_IN');
 
@@ -135,7 +135,7 @@ export class AuthService {
     return user;
   }
 
-  async validateUserJwt(payload: JwtPayload): Promise<JwtPayload> {
+  async validateUserJwt(payload: JwtPayload): Promise<UserEntity> {
     // get user by passing Jwt payload
     const user = await this._userServ.findByPayload(payload);
 
@@ -144,7 +144,8 @@ export class AuthService {
       throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
 
+    await this._userServ.updateLastActiveOn({ id: user.id });
     // return user
-    return payload;
+    return user;
   }
 }

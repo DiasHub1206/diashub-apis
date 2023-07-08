@@ -26,7 +26,13 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  // ensure all endpoints are protected from receiving incorrect data
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
 
   setupSwager(app);
 

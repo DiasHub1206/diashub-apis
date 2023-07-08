@@ -1,10 +1,14 @@
 import { PlatformEntity } from 'src/common/entity/platform.entity';
 import { AccountStatus, UserRole } from 'src/common/enums';
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { UserExperienceEntity } from './user-experience.entity';
+import { UserEducationEntity } from './user-education.entity';
+import { UserCertificationEntity } from './user-certification.entity';
+import { UserProjectEntity } from './user-project.entity';
 
 @Entity({ name: 'user' })
-export class User extends PlatformEntity {
+export class UserEntity extends PlatformEntity {
   @Column({ type: 'varchar', nullable: false })
   firstName: string;
 
@@ -36,6 +40,24 @@ export class User extends PlatformEntity {
   })
   accountStatus: AccountStatus;
 
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  lastActiveOn: Date;
+
+  @OneToMany(() => UserExperienceEntity, (experience) => experience.user)
+  experiences: UserExperienceEntity[];
+
+  @OneToMany(() => UserEducationEntity, (education) => education.user)
+  educations: UserEducationEntity[];
+
+  @OneToMany(() => UserProjectEntity, (project) => project.user)
+  projects: UserEducationEntity[];
+
+  @OneToMany(
+    () => UserCertificationEntity,
+    (certification) => certification.user,
+  )
+  certifications: UserEducationEntity[];
+
   @BeforeInsert() emailLowerCase() {
     this.email = this.email.toLowerCase();
   }
@@ -46,5 +68,9 @@ export class User extends PlatformEntity {
 
   @BeforeUpdate() async hashPasswordOnUpdate() {
     this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
   }
 }

@@ -8,10 +8,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { AllowUnverified } from 'src/decorators/allow-unverified.decorator';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { OnlyLoggedOut } from 'src/decorators/only-logged-out.decorator';
+import { Public } from 'src/decorators/public.decorator';
 import { SignupPostBodyDto } from 'src/user/dto/signup-post-body.dto';
+import { UserLoginDto } from 'src/user/dto/user-login.dto';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtPayload } from './interfaces/payload.interface';
@@ -23,6 +24,7 @@ export class AuthController {
   constructor(private readonly _authServ: AuthService) {}
 
   @OnlyLoggedOut()
+  @Public()
   @Post('register')
   public async register(
     @Body() signupPostBodyDto: SignupPostBodyDto,
@@ -51,16 +53,16 @@ export class AuthController {
    *
    * [1] allows only unauthenticated users
    *
-   * [2] allows users with unverified emails
-   *
-   * [3] guards this route with a localAuthGuard that uses local strategy
+   * [2] guards this route with a localAuthGuard that uses local strategy
    *  to vaildate user credentials (e.g. email, password)
    *
    * @param {*} { user }
    * @returns {Promise<JwtPayload>}
    * @memberof AuthController
    */
-  // @OnlyLoggedOut() // [1]
+  @OnlyLoggedOut() // [1]
+  @Public()
+  @ApiBody({ type: UserLoginDto })
   @UseGuards(LocalAuthGuard) // [2]
   @Post('login')
   public async login(@Req() req, @Res() res): Promise<JwtPayload> {

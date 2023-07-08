@@ -1,3 +1,3 @@
-import { User } from 'src/user/entity/user.entity';
+import { UserEntity } from 'src/user/entity/user.entity';
 
-export type UserEntityType = User;
+export type UserEntityType = UserEntity;
