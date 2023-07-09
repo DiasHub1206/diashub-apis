@@ -9,8 +9,10 @@ import {
   Patch,
   Post,
   Request,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { IdDto } from 'src/common/dto/id.dto';
 import { UserRole } from 'src/common/enums';
 import { UserHasRole } from 'src/decorators/user-has-role.decorator';
@@ -30,6 +32,10 @@ import { UpdateUserProjectDto } from './dto/update-user-project.entity';
 import { UpdateUserCertificationDto } from './dto/update-user-certification.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DeleteResult } from 'typeorm';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { imageFileFilter } from 'src/common/utils';
+import { FileDto } from 'src/asset/dto/file.dto';
+import { toFileDto } from 'src/common/mapper';
 
 @Controller('api/user')
 @ApiTags('User')
@@ -57,6 +63,41 @@ export class UserController {
     @Request() request: Express.Request,
   ): Promise<boolean> {
     return await this._userServ.update((request as any).user.id, updateUserDto);
+  }
+
+  @UserHasRole([UserRole.STUDENT])
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['image'],
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: { files: 1, fileSize: 4572864 }, // 4.5 mb
+      fileFilter: imageFileFilter,
+    }),
+  )
+  @Patch('me/profile-photo')
+  async uploadMyProfilePhoto(
+    @UploadedFile() image: Express.Multer.File,
+    @Request() request: Express.Request,
+  ): Promise<FileDto> {
+    const { id: userId } = (request as any).user;
+
+    const profilePhoto = await this._userServ.uploadProfilePhoto(
+      { userId },
+      image,
+    );
+
+    return toFileDto(profilePhoto);
   }
 
   @UserHasRole([UserRole.STUDENT, UserRole.ADMIN])

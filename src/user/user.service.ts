@@ -27,6 +27,14 @@ import { UpdateUserEducationDto } from './dto/update-user-education.dto';
 import { UpdateUserProjectDto } from './dto/update-user-project.entity';
 import { UpdateUserCertificationDto } from './dto/update-user-certification.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { FileEntity } from 'src/asset/entity/file.entity';
+import imageSize from 'image-size';
+import { promisify } from 'util';
+import { ConfigService } from '@nestjs/config';
+import { AssetService } from 'src/asset/asset.service';
+import GCSUtils from 'src/common/gcs-utils';
+
+const sizeOf = promisify(imageSize);
 
 @Injectable()
 export class UserService {
@@ -41,6 +49,8 @@ export class UserService {
     private readonly _userProj: Repository<UserProjectEntity>,
     @InjectRepository(UserCertificationEntity)
     private readonly _userCert: Repository<UserCertificationEntity>,
+    private readonly _assetServ: AssetService,
+    private readonly _configServ: ConfigService,
   ) {}
   async create(userDto: SignupPostBodyDto): Promise<UserEntity> {
     const { firstName, lastName, email, password, role } = userDto;
@@ -138,12 +148,18 @@ export class UserService {
   }
 
   async getUserDetails(id: string): Promise<UserEntity> {
-    const result = await this._user
+    const resultArr = await this._user
       .createQueryBuilder('user')
       .select([
         'user.id',
         'user.firstName',
         'user.lastName',
+        'user.username',
+        'user.email',
+        'user.mobileNumber',
+        'user.countryCode',
+        'user.role',
+        'user.lastActiveOn',
 
         'exp.id',
         'exp.employmentType',
@@ -184,19 +200,66 @@ export class UserService {
       .leftJoin('user.educations', 'edu')
       .leftJoin('user.projects', 'proj')
       .leftJoin('user.certifications', 'cert')
+
+      .leftJoinAndMapOne(
+        'user.profilePhoto',
+        FileEntity,
+        'profilePhoto',
+        'user.profilePhotoId = profilePhoto.id',
+      )
+
       .where('user.id =:id', { id })
       .getMany();
 
-    return result[0];
+    const result = resultArr[0];
+
+    if (result.profilePhoto.status === 'processed') {
+      result.profilePhoto.name =
+        await GCSUtils.getInstance().generateV4ReadSignedUrl(
+          this._configServ.get('GCS_BUCKET_NAME'),
+          result.profilePhoto.name,
+        );
+    }
+
+    return result;
+  }
+
+  async uploadProfilePhoto(
+    { userId }: { userId: string },
+    image: Express.Multer.File,
+  ): Promise<FileEntity> {
+    const dimensions = await sizeOf(image.path);
+
+    const [file] = await this._assetServ.uploadAndSaveFiles([
+      {
+        file: image,
+        type: 'image',
+        metadata: {
+          height: dimensions.height,
+          width: dimensions.width,
+          orientation: dimensions.orientation,
+        },
+      },
+    ]);
+
+    await this._user.update({ id: userId }, { profilePhotoId: file.id });
+
+    return file;
   }
 
   async getUserPublicDetails(id: string): Promise<UserEntity> {
-    const result = await this._user
+    const resultArr = await this._user
       .createQueryBuilder('user')
       .select([
         'user.id',
         'user.firstName',
         'user.lastName',
+        'user.username',
+        'user.email',
+        'user.mobileNumber',
+        'user.countryCode',
+        'user.role',
+        'user.lastActiveOn',
 
         'exp.id',
         'exp.employmentType',
@@ -237,11 +300,30 @@ export class UserService {
       .leftJoin('user.educations', 'edu')
       .leftJoin('user.projects', 'proj')
       .leftJoin('user.certifications', 'cert')
+
+      .leftJoinAndMapOne(
+        'user.profilePhoto',
+        FileEntity,
+        'profilePhoto',
+        'user.profilePhotoId = profilePhoto.id',
+      )
+
       .where('user.id =:id', { id })
       .getMany();
 
-    return result[0];
+    const result = resultArr[0];
+
+    if (result.profilePhoto.status === 'processed') {
+      result.profilePhoto.name =
+        await GCSUtils.getInstance().generateV4ReadSignedUrl(
+          this._configServ.get('GCS_BUCKET_NAME'),
+          result.profilePhoto.name,
+        );
+    }
+
+    return result;
   }
+
   async createUserExperience(
     userId: string,
     userExperienceDto: AddUserExperienceDto,

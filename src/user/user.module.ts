@@ -1,5 +1,12 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { diskStorage } from 'multer';
+import * as path from 'path';
+import { AssetService } from 'src/asset/asset.service';
+import { FileEntity } from 'src/asset/entity/file.entity';
+import { editFileName } from 'src/common/utils';
 import { UserCertificationEntity } from './entity/user-certification.entity';
 import { UserEducationEntity } from './entity/user-education.entity';
 import { UserExperienceEntity } from './entity/user-experience.entity';
@@ -16,10 +23,23 @@ import { UserService } from './user.service';
       UserEducationEntity,
       UserProjectEntity,
       UserCertificationEntity,
+      FileEntity,
     ]),
+    MulterModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async () => {
+        return {
+          storage: diskStorage({
+            destination: path.resolve(path.join(__dirname, '../..', 'uploads')),
+            filename: editFileName,
+          }),
+        };
+      },
+      inject: [ConfigService],
+    }),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, AssetService],
   exports: [UserService],
 })
 export class UserModule {}

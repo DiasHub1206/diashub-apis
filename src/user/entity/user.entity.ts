@@ -6,6 +6,7 @@ import { UserExperienceEntity } from './user-experience.entity';
 import { UserEducationEntity } from './user-education.entity';
 import { UserCertificationEntity } from './user-certification.entity';
 import { UserProjectEntity } from './user-project.entity';
+import { FileEntity } from 'src/asset/entity/file.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends PlatformEntity {
@@ -42,6 +43,12 @@ export class UserEntity extends PlatformEntity {
 
   @Column({ type: 'timestamp with time zone', nullable: true })
   lastActiveOn: Date;
+
+  @Column({ type: 'uuid', nullable: true })
+  profilePhotoId?: string;
+
+  @OneToMany(() => UserProjectEntity, (project) => project.user)
+  profilePhoto: FileEntity;
 
   @OneToMany(() => UserExperienceEntity, (experience) => experience.user)
   experiences: UserExperienceEntity[];
