@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CommonModule } from './common/common.module';
 import typeorm from './config/typeorm';
+import { SkillModule } from './skill/skill.module';
 import { UserRoleGuard } from './user/user-role.guard';
 import { UserModule } from './user/user.module';
 
@@ -28,6 +29,7 @@ import { UserModule } from './user/user.module';
     CommonModule,
     UserModule,
     AssetModule,
+    SkillModule,
   ],
   controllers: [AppController],
   providers: [

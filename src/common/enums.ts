@@ -23,3 +23,9 @@ export enum WorkLocationType {
   HYBRID = 'hybrid',
   REMOTE = 'remote',
 }
+
+export enum SkillProficiency {
+  BEGINNER = 'beginner',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+}

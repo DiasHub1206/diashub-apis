@@ -7,6 +7,7 @@ import { UserEducationEntity } from './user-education.entity';
 import { UserCertificationEntity } from './user-certification.entity';
 import { UserProjectEntity } from './user-project.entity';
 import { FileEntity } from 'src/asset/entity/file.entity';
+import { SkillToUserEntity } from 'src/skill/entity/skill-to-user.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends PlatformEntity {
@@ -58,6 +59,9 @@ export class UserEntity extends PlatformEntity {
 
   @OneToMany(() => UserProjectEntity, (project) => project.user)
   projects: UserEducationEntity[];
+
+  @OneToMany(() => SkillToUserEntity, (skill) => skill.user)
+  skills: SkillToUserEntity[];
 
   @OneToMany(
     () => UserCertificationEntity,
