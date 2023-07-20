@@ -41,18 +41,22 @@ export class SkillService {
     const resultArr = await this._skillRepo.query(
       `
         SELECT
-        sk.name
+        sk."id" "id",
+        sk."name" "name"
 
         FROM
             skill sk
 
-        WHERE sk."name" ILIKE ${term}::TEXT
-            AND sk.deleted = false
+        WHERE TRUE
+        
+        ${term ? `AND sk."name" ILIKE ${term}::TEXT` : ''}
+          
+          AND sk.deleted = false
 
-        SKIP 
-            ${offset}
+        OFFSET 
+            ${offset}::INTEGER
         LIMIT
-            ${limit}
+            ${limit}::INTEGER
         `,
     );
 

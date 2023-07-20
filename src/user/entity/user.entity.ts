@@ -61,7 +61,7 @@ export class UserEntity extends PlatformEntity {
   projects: UserEducationEntity[];
 
   @OneToMany(() => SkillToUserEntity, (skill) => skill.user)
-  skills: SkillToUserEntity[];
+  userSkills: SkillToUserEntity[];
 
   @OneToMany(
     () => UserCertificationEntity,

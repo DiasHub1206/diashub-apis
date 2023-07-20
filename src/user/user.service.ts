@@ -195,11 +195,18 @@ export class UserService {
         'cert.credentialUrl',
         'cert.issueDate',
         'cert.expirationDate',
+
+        'sku.id',
+        'sku.proficiency',
+        'sk.id',
+        'sk.name',
       ])
       .leftJoin('user.experiences', 'exp')
       .leftJoin('user.educations', 'edu')
       .leftJoin('user.projects', 'proj')
       .leftJoin('user.certifications', 'cert')
+      .leftJoin('user.userSkills', 'sku')
+      .leftJoin('sku.skill', 'sk')
 
       .leftJoinAndMapOne(
         'user.profilePhoto',
@@ -295,11 +302,18 @@ export class UserService {
         'cert.credentialUrl',
         'cert.issueDate',
         'cert.expirationDate',
+
+        'sku.id',
+        'sku.proficiency',
+        'sk.id',
+        'sk.name',
       ])
       .leftJoin('user.experiences', 'exp')
       .leftJoin('user.educations', 'edu')
       .leftJoin('user.projects', 'proj')
       .leftJoin('user.certifications', 'cert')
+      .leftJoin('user.userSkills', 'sku')
+      .leftJoin('sku.skill', 'sk')
 
       .leftJoinAndMapOne(
         'user.profilePhoto',

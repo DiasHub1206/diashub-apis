@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { ListItemsDto } from 'src/common/dto/list-items.dto';
 
 export class SkillQueryDto extends ListItemsDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  term: string;
+  term?: string;
 }

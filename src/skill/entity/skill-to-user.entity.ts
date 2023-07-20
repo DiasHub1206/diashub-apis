@@ -21,7 +21,7 @@ export class SkillToUserEntity extends PlatformEntity {
   skillId: string;
 
   // many skills have one student
-  @ManyToOne(() => UserEntity, (user) => user.skills, {
+  @ManyToOne(() => UserEntity, (user) => user.userSkills, {
     nullable: false,
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
