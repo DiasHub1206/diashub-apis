@@ -1,6 +1,14 @@
 import { PlatformEntity } from 'src/common/entity/platform.entity';
 import { AccountStatus, UserRole } from 'src/common/enums';
-import { BeforeInsert, BeforeUpdate, Column, Entity, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { UserExperienceEntity } from './user-experience.entity';
 import { UserEducationEntity } from './user-education.entity';
@@ -8,6 +16,7 @@ import { UserCertificationEntity } from './user-certification.entity';
 import { UserProjectEntity } from './user-project.entity';
 import { FileEntity } from 'src/asset/entity/file.entity';
 import { SkillToUserEntity } from 'src/skill/entity/skill-to-user.entity';
+import { FeedEntity } from 'src/feed/entity/feed.entity';
 
 @Entity({ name: 'user' })
 export class UserEntity extends PlatformEntity {
@@ -48,8 +57,10 @@ export class UserEntity extends PlatformEntity {
   @Column({ type: 'uuid', nullable: true })
   profilePhotoId?: string;
 
-  @OneToMany(() => UserProjectEntity, (project) => project.user)
-  profilePhoto: FileEntity;
+  // one user has one profile photo
+  @OneToOne(() => FileEntity, { eager: true, nullable: true })
+  @JoinColumn()
+  profilePhoto?: FileEntity;
 
   @OneToMany(() => UserExperienceEntity, (experience) => experience.user)
   experiences: UserExperienceEntity[];
@@ -62,6 +73,9 @@ export class UserEntity extends PlatformEntity {
 
   @OneToMany(() => SkillToUserEntity, (skill) => skill.user)
   userSkills: SkillToUserEntity[];
+
+  @OneToMany(() => FeedEntity, (feed) => feed.user)
+  feeds: FeedEntity[];
 
   @OneToMany(
     () => UserCertificationEntity,

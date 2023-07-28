@@ -29,3 +29,15 @@ export enum SkillProficiency {
   INTERMEDIATE = 'intermediate',
   ADVANCED = 'advanced',
 }
+
+export enum FeedVisibility {
+  PUBLIC = 'public',
+  CONNECTION = 'connection',
+  // We have to define group
+  GROUP = 'group',
+}
+
+export enum FeedAssetType {
+  IMAGE = 'image',
+  VIDEO = 'video',
+}

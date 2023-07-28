@@ -220,7 +220,7 @@ export class UserService {
 
     const result = resultArr[0];
 
-    if (result.profilePhoto.status === 'processed') {
+    if (result.profilePhoto?.status === 'processed') {
       result.profilePhoto.name =
         await GCSUtils.getInstance().generateV4ReadSignedUrl(
           this._configServ.get('GCS_BUCKET_NAME'),

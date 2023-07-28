@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Query, Request } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { UserRole } from 'src/common/enums';
 import { UserHasRole } from 'src/decorators/user-has-role.decorator';
 import { CreateSkillToUserDto } from './dto/create-skill-to-user.dto';
@@ -8,7 +9,8 @@ import { SkillToUserEntity } from './entity/skill-to-user.entity';
 import { SkillEntity } from './entity/skill.entity';
 import { SkillService } from './skill.service';
 
-@Controller('skill')
+@Controller('api/skill')
+@ApiTags('Skill')
 export class SkillController {
   constructor(private readonly _skillServ: SkillService) {}
 

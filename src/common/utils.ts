@@ -24,6 +24,28 @@ export const slugifyFileName = (originalName: string): string => {
   return `${slug}-${uuidV1}${fileExtName}`;
 };
 
+export const feedFileFilter = async (
+  req: Request,
+  file: Express.Multer.File,
+  callback: (error: Error, acceptFile: boolean) => void,
+) => {
+  const acceptableMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+
+    'mp4',
+    'webm',
+    'mov',
+  ];
+
+  if (!acceptableMimeTypes.includes(file.mimetype)) {
+    return callback(new Error('File type is not allowed!'), false);
+  }
+
+  return callback(null, true);
+};
+
 export const editFileName = (
   req: Request,
   file: Express.Multer.File,
