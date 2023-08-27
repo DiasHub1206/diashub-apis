@@ -46,12 +46,12 @@ name: Build and Deploy to Cloud Run
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ['master']
 
 env:
   PROJECT_ID: e-lexicon-392214 # TODO: update Google Cloud project id
   GAR_LOCATION: asia-south1 # TODO: update Artifact Registry location
-  SERVICE: diashub-apis	 # TODO: update Cloud Run service name
+  SERVICE: diashub-apis # TODO: update Cloud Run service name
   REGION: asia-south1 # TODO: update Cloud Run service region
 
 jobs:
@@ -65,6 +65,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          # Make sure to authenticate for private repositories
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Google Auth
         id: auth
