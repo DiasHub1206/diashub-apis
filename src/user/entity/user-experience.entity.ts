@@ -23,6 +23,9 @@ export class UserExperienceEntity extends PlatformEntity {
   })
   employmentType: EmploymentType;
 
+  @Column({ type: 'varchar', nullable: true })
+  title: string;
+
   @Column({ type: 'varchar', nullable: false })
   companyName: string;
 

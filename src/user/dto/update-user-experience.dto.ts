@@ -10,6 +10,10 @@ import { EmploymentType, WorkLocationType } from 'src/common/enums';
 export class UpdateUserExperienceDto {
   @IsOptional()
   @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
   companyName?: string;
 
   @IsOptional()

@@ -11,6 +11,10 @@ import { EmploymentType, WorkLocationType } from 'src/common/enums';
 export class AddUserExperienceDto {
   @IsNotEmpty()
   @IsString()
+  title: string;
+
+  @IsNotEmpty()
+  @IsString()
   companyName: string;
 
   @IsNotEmpty()
