@@ -3,11 +3,11 @@ import { IsDate, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class AddUserCertificationDto {
   @IsNotEmpty()
   @IsString()
-  company: string;
+  organization: string;
 
   @IsNotEmpty()
   @IsString()
-  degree: string;
+  name: string;
 
   @IsOptional()
   @IsString()
