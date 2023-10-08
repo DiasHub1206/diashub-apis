@@ -162,6 +162,7 @@ export class UserService {
         'user.lastActiveOn',
 
         'exp.id',
+        'exp.title',
         'exp.employmentType',
         'exp.companyName',
         'exp.location',
@@ -189,8 +190,8 @@ export class UserService {
         'proj.isCurrentlyWorking',
 
         'cert.id',
-        'cert.company',
-        'cert.degree',
+        'cert.organization',
+        'cert.name',
         'cert.credentialId',
         'cert.credentialUrl',
         'cert.issueDate',
@@ -269,6 +270,7 @@ export class UserService {
         'user.lastActiveOn',
 
         'exp.id',
+        'exp.title',
         'exp.employmentType',
         'exp.companyName',
         'exp.location',
@@ -296,8 +298,8 @@ export class UserService {
         'proj.isCurrentlyWorking',
 
         'cert.id',
-        'cert.company',
-        'cert.degree',
+        'cert.organization',
+        'cert.name',
         'cert.credentialId',
         'cert.credentialUrl',
         'cert.issueDate',
@@ -327,7 +329,7 @@ export class UserService {
 
     const result = resultArr[0];
 
-    if (result.profilePhoto.status === 'processed') {
+    if (result.profilePhoto?.status === 'processed') {
       result.profilePhoto.name =
         await GCSUtils.getInstance().generateV4ReadSignedUrl(
           this._configServ.get('GCS_BUCKET_NAME'),

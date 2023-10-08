@@ -15,10 +15,10 @@ export class UserCertificationEntity extends PlatformEntity {
   userId: string;
 
   @Column({ type: 'varchar', nullable: false })
-  company: string;
+  organization: string;
 
   @Column({ type: 'varchar', nullable: false })
-  degree: string;
+  name: string;
 
   @Column({ type: 'varchar', nullable: true })
   credentialId: string;
