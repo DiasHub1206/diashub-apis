@@ -49,9 +49,9 @@ on:
     branches: ['master']
 
 env:
-  PROJECT_ID: e-lexicon-392214 # TODO: update Google Cloud project id
+  PROJECT_ID: quixotic-bonito-408718 # TODO: update Google Cloud project id
   GAR_LOCATION: asia-south1 # TODO: update Artifact Registry location
-  SERVICE: diashub-apis # TODO: update Cloud Run service name
+  SERVICE: live-in-sync-apis # TODO: update Cloud Run service name
   REGION: asia-south1 # TODO: update Cloud Run service region
 
 jobs:
