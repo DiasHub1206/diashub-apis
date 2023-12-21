@@ -50,9 +50,9 @@ on:
 
 env:
   PROJECT_ID: quixotic-bonito-408718 # TODO: update Google Cloud project id
-  GAR_LOCATION: asia-south2 # TODO: update Artifact Registry location
+  GAR_LOCATION: europe-north1 # TODO: update Artifact Registry location
   SERVICE: diashub-apis # TODO: update Cloud Run service name
-  REGION: asia-south2 # TODO: update Cloud Run service region
+  REGION: europe-north1 # TODO: update Cloud Run service region
 
 jobs:
   deploy:
