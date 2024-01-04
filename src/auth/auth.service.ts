@@ -53,15 +53,22 @@ export class AuthService {
     expiresIn.setDate(expiresIn.getDate() + 1);
 
     // need to define domain
-    const cookieDomains = req.hostname === 'localhost' ? ['localhost'] : [''];
+    const cookieDomains =
+      req.hostname === 'localhost'
+        ? ['localhost']
+        : [
+            process.env.WEB_APP_DOMAIN,
+            '',
+            'diashub-apis-3qmisfeijq-el.a.run.app',
+          ];
 
     cookieDomains.forEach((d) => {
       res.cookie('access-token', token, {
         expires: expiresIn,
-        httpOnly: false,
+        httpOnly: true,
         path: '/',
-        secure: false,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'none',
         domain: d,
       });
     });
