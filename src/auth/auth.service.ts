@@ -56,11 +56,7 @@ export class AuthService {
     const cookieDomains =
       req.hostname === 'localhost'
         ? ['localhost']
-        : [
-            process.env.WEB_APP_DOMAIN,
-            '',
-            'diashub-apis-3qmisfeijq-el.a.run.app',
-          ];
+        : [process.env.APP_DOMAIN, ''];
 
     cookieDomains.forEach((d) => {
       res.cookie('access-token', token, {
