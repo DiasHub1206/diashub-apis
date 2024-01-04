@@ -7,6 +7,7 @@ import * as path from 'path';
 import { AssetService } from 'src/asset/asset.service';
 import { FileEntity } from 'src/asset/entity/file.entity';
 import { editFileName } from 'src/common/utils';
+import { FeedModule } from 'src/feed/feed.module';
 import { UserCertificationEntity } from './entity/user-certification.entity';
 import { UserEducationEntity } from './entity/user-education.entity';
 import { UserExperienceEntity } from './entity/user-experience.entity';
@@ -37,6 +38,7 @@ import { UserService } from './user.service';
       },
       inject: [ConfigService],
     }),
+    FeedModule,
   ],
   controllers: [UserController],
   providers: [UserService, AssetService],

@@ -41,8 +41,18 @@ export class UserEntity extends PlatformEntity {
   @Column({ type: 'varchar', nullable: true, default: '+91' })
   countryCode: string;
 
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.STUDENT })
   role: UserRole;
+
+  @Column({ type: 'varchar', nullable: true })
+  shortInfo?: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  about?: string;
+
+  // github, leetcode etc
+  @Column({ type: 'varchar', nullable: true })
+  personalLink?: string;
 
   @Column({
     type: 'enum',

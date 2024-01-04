@@ -224,7 +224,7 @@ export class UserController {
     return await this._userServ.deleteUserProject(id, userId);
   }
 
-  @UserHasRole([UserRole.STUDENT,UserRole.ADMIN])
+  @UserHasRole([UserRole.STUDENT, UserRole.ADMIN])
   @Post('me/certification')
   async createUserCertification(
     @Body() userCertificationDto: AddUserCertificationDto,

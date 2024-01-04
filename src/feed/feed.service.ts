@@ -1,8 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AssetService } from 'src/asset/asset.service';
 import { FileEntity } from 'src/asset/entity/file.entity';
-import { ListItemsDto } from 'src/common/dto/list-items.dto';
 import GCSUtils from 'src/common/gcs-utils';
 import {
   DeleteResult,
@@ -89,7 +93,27 @@ export class FeedService {
     return await this._feedRepo.findOne({ where: { id: feedId, userId } });
   }
 
-  async searchPost({ limit, offset }: ListItemsDto) {
+  async getFeedCount({
+    userId,
+  }: {
+    userId?: string;
+  }): Promise<{ count: number }> {
+    const result = await this._feedRepo.count({
+      where: { userId, deleted: false },
+    });
+
+    return { count: result };
+  }
+
+  async searchPost({
+    limit,
+    offset,
+    userId,
+  }: {
+    limit: number;
+    offset: number;
+    userId?: string;
+  }) {
     //todo: add comment and likes
     const resultArr = await this._feedRepo.query(
       `
@@ -126,6 +150,8 @@ export class FeedService {
 
       WHERE feed."deleted" = false
 
+      ${userId ? `AND feed."userId" = '${userId}'` : ``}
+
       ORDER BY feed."updatedAt" DESC
 
       LIMIT $1
@@ -156,6 +182,76 @@ export class FeedService {
     }
 
     return resultArr;
+  }
+
+  async getDetailedPost(id: string) {
+    const resultArr = await this._feedRepo.query(
+      `
+      SELECT 
+        feed."id" "id",
+        feed."content" "content",
+        feed."visibility" "visibility",
+        feed."asset" "asset",
+        feed."createdAt" "createdAt",
+        feed."userId" "userId",
+        u."firstName" "firstName",
+        u."lastName" "lastName",
+        u."profilePhotoId" "profilePhotoId",
+        fl."likeCount" "likeCount"
+        
+      FROM feed 
+
+      LEFT JOIN (
+        SELECT
+          COUNT(fl."id") "likeCount",
+          fl."feedId" "feedId"
+
+        FROM feed_like fl
+
+        GROUP BY fl."feedId"
+      ) fl
+      ON fl."feedId" = feed."id"
+
+      INNER JOIN "user" u
+      ON u."id" = feed."userId"
+
+      LEFT JOIN file profile_photo
+      ON u."profilePhotoId" = profile_photo."id"
+
+      WHERE feed."deleted" = false
+      AND feed."id" = $1
+
+      ORDER BY feed."updatedAt" DESC
+      `,
+      [id],
+    );
+
+    if (resultArr.length === 0) {
+      throw new NotFoundException('Feed Not Found');
+    }
+
+    try {
+      for (let i = 0; i < resultArr.length; i++) {
+        if (resultArr[i].asset.asset) {
+          resultArr[i].asset = await Promise.all(
+            resultArr[i].asset?.asset.map(async (i) => {
+              const file = await GCSUtils.getInstance().generateV4ReadSignedUrl(
+                this._configServ.get('GCS_BUCKET_NAME'),
+                i.filePath,
+              );
+              return {
+                ...i,
+                filePath: file,
+              };
+            }),
+          );
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    return resultArr[0];
   }
 
   async editFeed({

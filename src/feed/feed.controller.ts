@@ -15,7 +15,6 @@ import {
 import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { IdDto } from 'src/common/dto/id.dto';
-import { ListItemsDto } from 'src/common/dto/list-items.dto';
 import { UserRole } from 'src/common/enums';
 import { feedFileFilter, imageFileFilter } from 'src/common/utils';
 import { UserHasRole } from 'src/decorators/user-has-role.decorator';
@@ -23,6 +22,7 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { CreateFeedDto } from './dto/create-feed.dto';
 import { FeedCommentParamDto } from './dto/feed-comment-param.dto';
+import { SearchQueryDto } from './dto/search-query.dto';
 import { FeedCommentEntity } from './entity/feed-comment.entity';
 import { FeedEntity } from './entity/feed.entity';
 import { FeedService } from './feed.service';
@@ -34,8 +34,8 @@ export class FeedController {
 
   @UserHasRole([UserRole.STUDENT])
   @Get('search')
-  async searchFeed(@Query() { limit, offset }: ListItemsDto) {
-    return await this._feedServ.searchPost({ limit, offset });
+  async searchFeed(@Query() { limit, offset, userId }: SearchQueryDto) {
+    return await this._feedServ.searchPost({ limit, offset, userId });
   }
   @UserHasRole([UserRole.STUDENT])
   @UseInterceptors(
@@ -58,6 +58,12 @@ export class FeedController {
     });
 
     return result;
+  }
+
+  @UserHasRole([UserRole.STUDENT])
+  @Get(':id')
+  async getById(@Param() { id }: IdDto) {
+    return await this._feedServ.getDetailedPost(id);
   }
 
   @UserHasRole([UserRole.STUDENT])

@@ -38,5 +38,6 @@ import { FeedService } from './feed.service';
   ],
   controllers: [FeedController],
   providers: [FeedService, AssetService],
+  exports: [FeedService],
 })
 export class FeedModule {}

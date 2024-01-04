@@ -33,6 +33,7 @@ import { promisify } from 'util';
 import { ConfigService } from '@nestjs/config';
 import { AssetService } from 'src/asset/asset.service';
 import GCSUtils from 'src/common/gcs-utils';
+import { FeedService } from 'src/feed/feed.service';
 
 const sizeOf = promisify(imageSize);
 
@@ -51,6 +52,7 @@ export class UserService {
     private readonly _userCert: Repository<UserCertificationEntity>,
     private readonly _assetServ: AssetService,
     private readonly _configServ: ConfigService,
+    private readonly _feedServ: FeedService,
   ) {}
   async create(userDto: SignupPostBodyDto): Promise<UserEntity> {
     const { firstName, lastName, email, password, role } = userDto;
@@ -160,6 +162,9 @@ export class UserService {
         'user.countryCode',
         'user.role',
         'user.lastActiveOn',
+        'user.shortInfo',
+        'user.about',
+        'user.personalLink',
 
         'exp.id',
         'exp.title',
@@ -268,6 +273,9 @@ export class UserService {
         'user.countryCode',
         'user.role',
         'user.lastActiveOn',
+        'user.shortInfo',
+        'user.about',
+        'user.personalLink',
 
         'exp.id',
         'exp.title',
@@ -344,6 +352,10 @@ export class UserService {
     userId: string,
     userExperienceDto: AddUserExperienceDto,
   ): Promise<UserExperienceEntity> {
+    if (userExperienceDto.isCurrentlyWorking === true) {
+      userExperienceDto.endDate = null;
+    }
+
     const experience = this._userExpe.create({
       userId,
       ...userExperienceDto,
@@ -359,6 +371,10 @@ export class UserService {
     userId: string,
     userExperienceDto: UpdateUserExperienceDto,
   ): Promise<boolean> {
+    if (userExperienceDto.isCurrentlyWorking === true) {
+      userExperienceDto.endDate = null;
+    }
+
     const updatedResult = await this._userExpe.update(
       { id, userId },
       { ...userExperienceDto },
